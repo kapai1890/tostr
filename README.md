@@ -2,15 +2,13 @@
 Convert any value to string with this tool.
 
 # Requirements
-* PHP 5.6+
+* PHP 5.3
 
 # Installation
-* Include `main.php` file to use ToStr as a module in your project.
-* Or include `standalone.php` to use ToStr as ready-to-use solution, with functions `tostr`, `tostrs` and `tostrx`.
+* Include `main.php` file to your project.
 
 # Functions
-When loaded using `standalone.php`, the module will add 3 functions:
-1. **tostr(...$vars)** - converts all passed values into single string message (with newline character in the end). All root strings will be printed without quotes "".
+1. **tostr(...$vars)** --- converts all passed values into single string message (with newline character in the end). All root strings will be printed without quotes `""`.
 ```php
 $ tostr('Offset:', 3);
 > Offset: 3
@@ -19,19 +17,22 @@ $ tostr(['offset' => 3]);
 > ["offset" => 3]
 ```
 
-2. **tostrs(...$vars)** - same as previous, but always prints all strings with quotes "".
+2. **tostrs(...$vars)** --- same as previous, but always prints all strings with quotes `""`.
 ```php
+$ tostrs('Hello world');
+> "Hello world"
+
 $ tostrs('Offset:', 3);
 > "Offset:" 3
 ```
 
-3. **tostrms($message, ...$vars)** - same as tostrs(), but prints the $message without quotes "".
+3. **tostrms(** string **$message, ...$vars)** --- same as tostrs(), but prints `$message` without quotes `""`.
 ```php
 $ tostrms('Offset:', 'three');
 > Offset: "three"
 ```
 
-4. **tostrx($var, $type[, $maxDepth = 5])** - converts the passed value indicating it's type manually.
+4. **tostrx($var,** string **$type,** int **$maxDepth** _= -1_**)** --- converts the passed value, indicating it's type manually.
 ```php
 $ tostr('count');
 > count
@@ -40,8 +41,15 @@ $ tostrs('count');
 > "count"
 
 $ tostrx('count', 'function');
-> function count($array_or_countable\[, $mode\]) { ... }
+> function count($array_or_countable[, $mode]) { ... }
 ```
+
+5. **tostru($var,** int **$maxDepth** _= -1_**, $recursiveClasses** _= []_**)** --- _objects mode_ --- build the message also going into the nested objects; by default all nested objects (objects in objects) have output format _"{%Instance of CLASS_NAME%}"_, this function changes the default rule.
+
+## Additional Functions
+* `asis($value)` --- ignore the real type of the value;
+* `get_default_string_builder()`;
+* `yesno($value)` --- convert boolean into _"yes"_/_"no"_ string.
 
 # Examples
 * **Boolean**: `true`, `false`.
@@ -83,7 +91,7 @@ class Exception implements Throwable
     public function __toString() { ... }
 }
 ```
-* **Structure** _(skips methods)_:
+* **Structure** _(skips methods and constants)_:
 ```php
 class Exception implements Throwable
 {

@@ -9,7 +9,7 @@ return [
     'assoc. array'  => [1 => 'Aa', 2 => 'Bb', 26 => 'Zz'],
     'date'          => new DateTime(),
     'null'          => null,
-    'as is'         => new \tostr\AsIs("I'm a string without quotes"),
+    'as is'         => new \NSCL\ToStr\AsIs("I'm a string without quotes"),
     'closure'       => function ($r, $g, $b, $a = 1.0) {},
     'callback'      => [new Exception(), 'getMessage'],
     'object'        => new Exception('Test exception')

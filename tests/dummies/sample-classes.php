@@ -22,6 +22,7 @@ class OnlyMethods
     public function findById($id) {}
     protected function count($countHidden = false) {}
     protected function translate($text, $domain = '') {}
+    private function recalculateAll() {}
     public static function getInstance() {}
 }
 
@@ -36,6 +37,7 @@ class NoConstants
     public function findById($id) {}
     protected function count($countHidden = false) {}
     protected function translate($text, $domain = '') {}
+    private function recalculateAll() {}
     public static function getInstance() {}
 }
 
@@ -49,6 +51,7 @@ class NoProperties
     public function findById($id) {}
     protected function count($countHidden = false) {}
     protected function translate($text, $domain = '') {}
+    private function recalculateAll() {}
     public static function getInstance() {}
 }
 
@@ -76,6 +79,7 @@ class AllInOne
     public function findById($id) {}
     protected function count($countHidden = false) {}
     protected function translate($text, $domain = '') {}
+    private function recalculateAll() {}
     public static function getInstance() {}
 }
 
