@@ -1,6 +1,6 @@
 <?php
 
-namespace tostr;
+namespace NSCL\ToStr;
 
 class AsIs
 {

@@ -1,141 +1,117 @@
 <?php
 
-namespace tostr;
-
 /**
- * @param mixed $var
- * @return \tostr\AsIs
+ * Ignore the real type of the value in future.
+ *
+ * @param mixed $value
+ * @return \NSCL\ToStr\AsIs
  */
-function asis($var)
+function asis($value)
 {
-    return new AsIs($var);
+    return new \NSCL\ToStr\AsIs($value);
 }
 
 /**
- * @param array $array
- * @return bool
+ * @return \NSCL\ToStr\StringBuilder
+ *
+ * @global \NSCL\ToStr\StringBuilder $tostr
  */
-function is_numeric_natural_array(array $array)
+function get_default_string_builder()
 {
-    foreach (array_keys($array) as $index => $key) {
-        if ($index !== $key) {
-            return false;
-        }
+    global $tostr;
+
+    if (!isset($tostr)) {
+        $stringifier = new \NSCL\ToStr\Stringifier();
+        $tostr = new \NSCL\ToStr\StringBuilder($stringifier);
     }
 
-    return true;
+    return $tostr;
 }
 
 /**
- * Combine results of two subpatterns into single array.
+ * Build message, but don't wrap root strings with "".
  *
- * @param string $pattern
- * @param string $subject
- * @param int $keyIndex If there are no such index in matches then the result
- *                      will be a numeric array with appropriate values.
- * @param int $valueIndex If there are no such index in matches then the result
- *                        will be an array with appropriate keys but with empty
- *                        values (empty strings "").
- * @return array
- */
-function regex_combine($pattern, $subject, $keyIndex = -1, $valueIndex = 0)
-{
-    $count  = (int)preg_match_all($pattern, $subject, $matches);
-    $keys   = isset($matches[$keyIndex]) ? $matches[$keyIndex] : [];
-    $values = isset($matches[$valueIndex]) ? $matches[$valueIndex] : array_fill(0, $count, '');
-
-    if (!empty($values) && !empty($keys)) {
-        return array_combine($keys, $values);
-    } else {
-        // Only $keys can be empty at this point (because we used array_fill()
-        // for values)
-        return $values;
-    }
-}
-
-/**
- * @param string $pattern
- * @param string $subject
- * @param int $index The index of the result group.
- * @return bool
- */
-function regex_test($pattern, $subject, $index = 0)
-{
-    $found = preg_match($pattern, $subject, $matches);
-    return ($found && isset($matches[$index]));
-}
-
-/**
- * Add number starting from the most right position of the string.
- *
- * @param string $str
- * @param int $add
+ * @param mixed[] $vars
  * @return string
  */
-function strradd($str, $add = 1)
+function tostr(...$vars)
 {
-    for ($i = strlen($str) - 1; $i >= 0; $i--) {
-        if ($str[$i] == '.' || $str[$i] == ',') {
-            continue;
+    // Convert root strings into `messages` (output them as is, without "")
+    $vars = array_map(function ($var) {
+        if (is_string($var) && !is_numeric($var)) {
+            $trimmed = trim($var);
+
+            if (!empty($trimmed)) {
+                // Show without ""
+                return asis($trimmed);
+            }
         }
 
-        $sum  = (int)$str[$i] + $add;
-        $tens = floor($sum / 10);
+        // Otherwise don't change the output method
+        return $var;
+    }, $vars);
 
-        $str[$i] = $sum - ($tens * 10);
-
-        $add = $tens;
-
-        if ($add == 0) {
-            break;
-        }
-    }
-
-    if ($add != 0) {
-        $str = $add . $str;
-    }
-
-    return $str;
+    return get_default_string_builder()->buildString($vars) . PHP_EOL;
 }
 
 /**
- * @param mixed $var
- * @return string The type of variable.
+ * Build message in strict mode (wrap all string with ""), except for the first
+ * message.
+ *
+ * @param string $message The message to print not strictly.
+ * @param mixed[] $vars
+ * @return string
  */
-function typeof($var)
+function tostrms($message, ...$vars)
 {
-    $type = strtolower(gettype($var));
+    $vars = array_merge(array(asis($message)), $vars);
+    return get_default_string_builder()->buildString($vars) . PHP_EOL;
+}
 
-    // Generalize or change the name of the type
-    switch ($type) {
-        case 'boolean': $type = 'bool';  break;
-        case 'integer': $type = 'int';   break;
-        case 'double':  $type = 'float'; break;
+/**
+ * Build message in strict mode (wrap all string with "").
+ *
+ * @param mixed[] $vars
+ * @return string
+ */
+function tostrs(...$vars)
+{
+    return get_default_string_builder()->buildString($vars) . PHP_EOL;
+}
 
-        case 'array':
-            if (is_callable($var)) { // [%Object or class%, %Method name%]
-                $type = 'callback';
-            }
-            break;
+/**
+ * Build the message also going into the nested objects.
+ *
+ * @param mixed $var Any object.
+ * @param int $maxDepth Optional. -1 by default (auto detect).
+ * @param array $recursiveClasses Optional. [stdClass] by default.
+ * @return string
+ */
+function tostru($var, $maxDepth = -1, $recursiveClasses = array())
+{
+    return get_default_string_builder()->buildStringWithObjects($var, $maxDepth, $recursiveClasses) . PHP_EOL;
+}
 
-        case 'object':
-            if (is_callable($var)) {
-                $type = 'closure';
-            } else if ($var instanceof \DateTime) {
-                $type = 'date';
-            } else if ($var instanceof \tostr\AsIs) {
-                $type = 'asis';
-            }
-            break;
+/**
+ * Convert value to string, indicating it's type manually.
+ *
+ * @param mixed $var
+ * @param string $type
+ * @param int $maxDepth Optional. -1 by default (auto detect).
+ * @return string
+ */
+function tostrx($vars, $type, $maxDepth = -1)
+{
+    return get_default_string_builder()->buildStringAs($vars, $type, $maxDepth) . PHP_EOL;
+}
 
-        case 'callable':
-            if (is_string($var)) {
-                $type = 'function';
-            } else {
-                $type = 'closure';
-            }
-            break;
-    }
-
-    return $type;
+/**
+ * Convert boolean into "yes"/"no" string.
+ *
+ * @param bool $value
+ * @return string
+ */
+function yesno($value)
+{
+    return tostrx($value, 'yesno');
 }
