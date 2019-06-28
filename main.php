@@ -2,11 +2,11 @@
 
 /*
  * Project Name: ToStr
- * Project URI: https://github.com/b.yevhen/tostr
+ * Project URI: https://github.com/byevhen2/tostr
  * Description: Convert any value to string with this tool.
  * Version: 3.0
  * Author: Biliavskyi Yevhen
- * Author URI: https://github.com/b.yevhen
+ * Author URI: https://github.com/byevhen2
  * License: MIT
  */
 
