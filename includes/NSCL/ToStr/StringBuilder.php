@@ -177,11 +177,11 @@ class StringBuilder
             if (in_array($type, array('array', 'iterable', 'object'))) {
                 $string = $this->toString($value, $type, $depth + 1, $maxDepth, $parents);
                 $string = $this->increaseIndent($string);
-
                 $child['value'] = $string;
-
-            // Wrap strings with "" and stringify nulls in constants
             } else if ($type == 'string' || ($type == 'null' && $stringifyNull)) {
+                // Wrap strings with "" and stringify nulls in constants
+                $child['value'] = $this->stringifier->stringify($value, $type);
+            } else {
                 $child['value'] = $this->stringifier->stringify($value, $type);
             }
         }
