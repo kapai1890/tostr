@@ -4,14 +4,14 @@
  * Project Name: ToStr
  * Project URI: https://github.com/byevhen2/tostr
  * Description: Convert any value to string with this tool.
- * Version: 3.0
+ * Version: 3.1.8
  * Author: Biliavskyi Yevhen
  * Author URI: https://github.com/byevhen2
  * License: MIT
  */
 
 if (!defined('ToStr')) {
-    define('ToStr', '3.0');
+    define('ToStr', '3.1.8');
 
     // Load NSCL classes and functions
     require __DIR__ . '/includes/NSCL/autoload.php';
